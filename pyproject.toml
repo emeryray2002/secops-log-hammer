@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "secops-log-hammer"
+version = "1.0.0"
+description = "Generate and ingest synthetic logs into Chronicle"
+readme = "README.md"
+requires-python = ">=3.7"
+license = "Apache-2.0"
+authors = [
+    { name = "Google SecOps Team", email = "chronicle@google.com" }
+]
+keywords = ["google", "security", "chronicle", "secops"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Security",
+]
+dependencies = [
+    "tqdm",
+    "google-auth",
+    "google-auth-oauthlib",
+    "requests",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/example/secops-log-hammer"
+"Bug Tracker" = "https://github.com/example/secops-log-hammer/issues"
+
+[project.scripts]
+log-hammer = "secops_log_hammer.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["secops_log_hammer*"] 

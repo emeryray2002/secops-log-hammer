@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+include pyproject.toml
+recursive-include secops_log_hammer *.py 

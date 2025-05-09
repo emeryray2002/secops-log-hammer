@@ -1,0 +1,1 @@
+"""Tests for the SecOps Log Hammer package.""" 
