@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "secops-log-hammer"
-version = "1.0.0"
+version = "1.1.0"
 description = "Generate and ingest synthetic logs into Chronicle"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -32,8 +32,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/example/secops-log-hammer"
-"Bug Tracker" = "https://github.com/example/secops-log-hammer/issues"
+"Homepage" = "https://github.com/emeryray2002/secops-log-hammer"
+"Bug Tracker" = "https://github.com/emeryray2002/secops-log-hammer/issues"
 
 [project.scripts]
 log-hammer = "secops_log_hammer.cli:main"
