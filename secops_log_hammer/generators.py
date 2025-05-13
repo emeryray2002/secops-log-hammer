@@ -6,8 +6,9 @@ import random
 import string
 import time
 import uuid
-from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+import ipaddress
+from datetime import datetime, timezone, timedelta
+from typing import Dict, Any, List, Optional, Tuple, Union
 
 
 def generate_ip_address() -> str:
@@ -17,6 +18,16 @@ def generate_ip_address() -> str:
         A random IPv4 address as a string.
     """
     return f"{random.randint(1, 254)}.{random.randint(0, 254)}.{random.randint(0, 254)}.{random.randint(1, 254)}"
+
+
+def generate_ipv6_address() -> str:
+    """Generate a random IPv6 address.
+    
+    Returns:
+        A random IPv6 address as a string.
+    """
+    segments = [f"{random.randint(0, 65535):x}" for _ in range(8)]
+    return ":".join(segments)
 
 
 def generate_hostname(domains: List[str]) -> str:
@@ -41,6 +52,116 @@ def generate_username() -> str:
     first_names = ["john", "jane", "alex", "emily", "michael", "sarah", "david", "laura"]
     last_names = ["smith", "jones", "doe", "brown", "wilson", "taylor", "lee", "white"]
     return f"{random.choice(first_names)}{random.choice(last_names)}{random.randint(10,99)}"
+
+
+def generate_mobile_device_info() -> Dict[str, str]:
+    """Generate random mobile device information.
+    
+    Returns:
+        A dictionary containing mobile device information.
+    """
+    device_types = ["iPhone", "iPad", "Android Phone", "Android Tablet"]
+    os_versions = {
+        "iPhone": ["iOS 15.4.1", "iOS 16.1.2", "iOS 16.5", "iOS 17.0", "iOS 17.1", "iOS 18.2.0"],
+        "iPad": ["iPadOS 15.6", "iPadOS 16.2", "iPadOS 16.5", "iPadOS 17.1"],
+        "Android Phone": ["Android 11", "Android 12", "Android 13", "Android 14"],
+        "Android Tablet": ["Android 11", "Android 12", "Android 13", "Android 14"]
+    }
+    
+    device_type = random.choice(device_types)
+    os_version = random.choice(os_versions[device_type])
+    
+    # Generate device model based on type
+    if "iPhone" in device_type:
+        model = f"iPhone {random.choice(['11', '12', '13', '14', '15', 'SE', 'Pro Max'])}"
+    elif "iPad" in device_type:
+        model = f"iPad {random.choice(['Air', 'Pro', 'Mini', '10.2-inch', '10.9-inch'])}"
+    elif "Android" in device_type:
+        manufacturers = ["Samsung", "Google", "OnePlus", "Xiaomi", "Motorola"]
+        models = {
+            "Samsung": ["Galaxy S22", "Galaxy S23", "Galaxy Note 20", "Galaxy A53"],
+            "Google": ["Pixel 6", "Pixel 7", "Pixel 7a", "Pixel 8"],
+            "OnePlus": ["9 Pro", "10T", "11", "Nord"],
+            "Xiaomi": ["Redmi Note 11", "Mi 12", "Poco F4"],
+            "Motorola": ["Edge 30", "G Power", "Razr"]
+        }
+        manufacturer = random.choice(manufacturers)
+        model = f"{manufacturer} {random.choice(models[manufacturer])}"
+    
+    device_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=24))
+    
+    return {
+        "device_type": device_type,
+        "model": model,
+        "os_version": os_version,
+        "device_id": device_id,
+        "is_managed": random.choice(["true", "false"]),
+        "is_compliant": random.choice(["true", "false"]),
+        "display_name": f"R{random.randint(1000000, 9999999)}"
+    }
+
+
+def generate_cloud_resource_info(project_id: str) -> Dict[str, str]:
+    """Generate random cloud resource information.
+    
+    Args:
+        project_id: The Google Cloud project ID.
+        
+    Returns:
+        A dictionary containing cloud resource information.
+    """
+    resource_types = ["compute_instance", "storage_bucket", "cloud_function", "gke_cluster", "bigquery_dataset"]
+    regions = ["us-central1", "us-east1", "us-west1", "europe-west1", "asia-east1", "australia-southeast1"]
+    
+    resource_type = random.choice(resource_types)
+    region = random.choice(regions)
+    
+    # Generate resource name based on type
+    if resource_type == "compute_instance":
+        name = f"vm-{random.choice(['prod', 'dev', 'test', 'staging'])}-{random.randint(1000, 9999)}"
+    elif resource_type == "storage_bucket":
+        name = f"{project_id}-{random.choice(['data', 'backup', 'assets', 'logs'])}-{random.randint(100, 999)}"
+    elif resource_type == "cloud_function":
+        name = f"func-{random.choice(['process', 'transform', 'analyze', 'trigger'])}-{random.randint(100, 999)}"
+    elif resource_type == "gke_cluster":
+        name = f"cluster-{random.choice(['prod', 'dev', 'test'])}-{random.randint(1, 5)}"
+    elif resource_type == "bigquery_dataset":
+        name = f"{random.choice(['raw', 'processed', 'analytics', 'reporting'])}_data"
+    else:
+        name = f"resource-{random.randint(1000, 9999)}"
+    
+    return {
+        "resource_type": resource_type,
+        "name": name,
+        "region": region,
+        "project_id": project_id,
+        "resource_id": str(random.randint(10**19, 10**20 - 1))
+    }
+
+
+def generate_service_account_info(project_id: str) -> Dict[str, str]:
+    """Generate random service account information.
+    
+    Args:
+        project_id: The Google Cloud project ID.
+        
+    Returns:
+        A dictionary containing service account information.
+    """
+    purposes = ["compute", "storage", "bigquery", "logging", "deployment", "monitoring"]
+    purpose = random.choice(purposes)
+    
+    sa_name = f"{purpose}-sa-{random.randint(100, 999)}"
+    sa_email = f"{sa_name}@{project_id}.iam.gserviceaccount.com"
+    sa_id = str(random.randint(10**19, 10**20 - 1))
+    
+    return {
+        "name": sa_name,
+        "email": sa_email,
+        "id": sa_id,
+        "project_id": project_id,
+        "display_name": f"Service Account for {purpose.capitalize()}"
+    }
 
 
 def generate_windows_process() -> Dict[str, str]:
@@ -119,6 +240,220 @@ def generate_windows_process() -> Dict[str, str]:
         "process_name": process_name,
         "command_line": cmd_line,
         "image_file_name": img_path
+    }
+
+
+def generate_dns_info() -> Dict[str, Any]:
+    """Generate random DNS request information.
+    
+    Returns:
+        A dictionary containing DNS request information.
+    """
+    # Common TLDs and subdomains
+    tlds = [".com", ".org", ".net", ".io", ".cloud", ".ai", ".dev", ".app"]
+    common_domains = ["example", "acme", "test", "dev", "prod", "internal", "corp", "cloud"]
+    subdomains = ["api", "app", "auth", "login", "admin", "portal", "cdn", "static", "media", "download"]
+    
+    # Sometimes generate suspicious-looking domains
+    suspicious_patterns = [
+        lambda: f"{''.join(random.choices(string.ascii_lowercase, k=random.randint(10, 20)))}{random.choice(tlds)}",
+        lambda: f"{''.join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(8, 15)))}.{''.join(random.choices(string.ascii_lowercase, k=random.randint(5, 10)))}.{random.choice(['com', 'net', 'ru', 'cn'])}",
+        lambda: f"{random.choice(common_domains)}-{''.join(random.choices(string.ascii_lowercase + string.digits, k=random.randint(5, 10)))}.{''.join(random.choices(string.ascii_lowercase, k=random.randint(4, 8)))}.{random.choice(['me', 'cc', 'biz', 'info'])}"
+    ]
+    
+    # Decide whether to generate a normal or suspicious domain
+    if random.random() < 0.8:  # 80% normal domains
+        if random.random() < 0.6:  # With subdomain
+            domain = f"{random.choice(subdomains)}.{random.choice(common_domains)}{random.choice(tlds)}"
+        else:  # Just domain
+            domain = f"{random.choice(common_domains)}{random.choice(tlds)}"
+    else:  # 20% suspicious domains
+        domain = random.choice(suspicious_patterns)()
+    
+    record_types = ["A", "AAAA", "MX", "TXT", "CNAME", "NS", "SRV"]
+    
+    return {
+        "domain": domain,
+        "record_type": random.choice(record_types),
+        "request_count": random.randint(1, 5),
+        "is_suspicious": random.random() < 0.2,  # 20% chance of being marked suspicious
+        "protocol": random.choice(["UDP", "TCP"]),
+        "interface_index": random.randint(0, 10)
+    }
+
+
+def generate_network_connection() -> Dict[str, Any]:
+    """Generate random network connection information.
+    
+    Returns:
+        A dictionary containing network connection information.
+    """
+    protocols = {
+        "6": "TCP",
+        "17": "UDP",
+        "1": "ICMP",
+        "58": "ICMPv6"
+    }
+    
+    protocol_num = random.choice(list(protocols.keys()))
+    protocol_name = protocols[protocol_num]
+    
+    # Common ports and their descriptions
+    common_ports = {
+        "20": "FTP Data",
+        "21": "FTP Control",
+        "22": "SSH",
+        "23": "Telnet",
+        "25": "SMTP",
+        "53": "DNS",
+        "80": "HTTP",
+        "110": "POP3",
+        "123": "NTP",
+        "143": "IMAP",
+        "443": "HTTPS",
+        "445": "SMB",
+        "993": "IMAPS",
+        "995": "POP3S",
+        "3306": "MySQL",
+        "3389": "RDP",
+        "5432": "PostgreSQL",
+        "8080": "HTTP Alternate",
+        "8443": "HTTPS Alternate"
+    }
+    
+    # Sometimes use common ports, sometimes random high ports
+    if random.random() < 0.7:  # 70% common ports
+        remote_port = random.choice(list(common_ports.keys()))
+        remote_port_desc = common_ports[remote_port]
+    else:  # 30% random high ports
+        remote_port = str(random.randint(10000, 65535))
+        remote_port_desc = "Unknown"
+    
+    # Local port is usually a high random port
+    local_port = str(random.randint(10000, 65535))
+    
+    # Decide connection direction
+    connection_direction = random.choice(["0", "1"])  # 0 = outbound, 1 = inbound
+    
+    # IP versions can be mixed
+    ip_version = random.choice(["4", "6"])
+    
+    return {
+        "protocol_number": protocol_num,
+        "protocol_name": protocol_name,
+        "local_port": local_port,
+        "remote_port": remote_port,
+        "remote_port_description": remote_port_desc,
+        "connection_direction": connection_direction,
+        "connection_flags": str(random.randint(0, 15)),
+        "ip_version": ip_version
+    }
+
+
+def generate_authentication_info() -> Dict[str, Any]:
+    """Generate random authentication information.
+    
+    Returns:
+        A dictionary containing authentication information.
+    """
+    auth_methods = ["Password", "OAuth", "SAML", "Kerberos", "Certificate", "Windows Integrated", 
+                   "MultiFactor", "Phone", "FIDO", "App", "SMS", "Email"]
+    
+    auth_results = [
+        {"result": "SUCCESS", "reason": None},
+        {"result": "FAILURE", "reason": "Invalid username or password"},
+        {"result": "FAILURE", "reason": "Account locked"},
+        {"result": "FAILURE", "reason": "Account disabled"},
+        {"result": "FAILURE", "reason": "MFA required"},
+        {"result": "CHALLENGE", "reason": "Additional verification required"},
+        {"result": "FAILURE", "reason": "IP address not allowed"},
+        {"result": "FAILURE", "reason": "Expired credentials"}
+    ]
+    
+    # Weight success higher than failures
+    result = random.choices(
+        auth_results,
+        weights=[0.7] + [0.3/7] * 7,  # 70% success, 30% distributed among failures
+        k=1
+    )[0]
+    
+    # For MFA, generate additional details
+    if "MultiFactor" in auth_methods:
+        mfa_types = ["SMS", "Phone call", "Authenticator app", "Security key", "Email"]
+        mfa_type = random.choice(mfa_types)
+    else:
+        mfa_type = None
+    
+    # Generate auth context details
+    auth_context = {
+        "auth_method": random.choice(auth_methods),
+        "result": result["result"],
+        "reason": result["reason"],
+        "mfa_type": mfa_type,
+        "mfa_completed": True if result["result"] == "SUCCESS" and mfa_type else False,
+        "auth_protocol": random.choice(["OAuth 2.0", "SAML 2.0", "OpenID Connect", "WS-Federation", "WS-Trust", "Basic", "NTLM", "Kerberos"]),
+        "auth_step": random.randint(0, 3),
+        "session_id": ''.join(random.choices(string.ascii_letters + string.digits, k=32))
+    }
+    
+    return auth_context
+
+
+def generate_security_alert() -> Dict[str, Any]:
+    """Generate random security alert information.
+    
+    Returns:
+        A dictionary containing security alert information.
+    """
+    alert_types = [
+        "Suspicious login attempt",
+        "Brute force attack",
+        "Account compromise",
+        "Data exfiltration",
+        "Malware detection",
+        "Command and control communication",
+        "Privilege escalation",
+        "Unusual admin activity",
+        "Password spray attack",
+        "Suspicious process execution",
+        "Lateral movement",
+        "Suspicious network activity"
+    ]
+    
+    severities = ["Low", "Medium", "High", "Critical"]
+    # Weight distribution for severity
+    severity_weights = [0.4, 0.3, 0.2, 0.1]  # More low/medium than high/critical
+    
+    # Status options
+    statuses = ["New", "In Progress", "Resolved", "Dismissed", "False Positive"]
+    status_weights = [0.4, 0.3, 0.2, 0.05, 0.05]  # More new/in progress than resolved
+    
+    # MITRE ATT&CK techniques
+    mitre_techniques = [
+        {"id": "T1078", "name": "Valid Accounts", "tactic": "Initial Access"},
+        {"id": "T1110", "name": "Brute Force", "tactic": "Credential Access"},
+        {"id": "T1566", "name": "Phishing", "tactic": "Initial Access"},
+        {"id": "T1053", "name": "Scheduled Task/Job", "tactic": "Execution"},
+        {"id": "T1059", "name": "Command and Scripting Interpreter", "tactic": "Execution"},
+        {"id": "T1098", "name": "Account Manipulation", "tactic": "Persistence"},
+        {"id": "T1134", "name": "Access Token Manipulation", "tactic": "Privilege Escalation"},
+        {"id": "T1068", "name": "Exploitation for Privilege Escalation", "tactic": "Privilege Escalation"},
+        {"id": "T1046", "name": "Network Service Discovery", "tactic": "Discovery"},
+        {"id": "T1071", "name": "Application Layer Protocol", "tactic": "Command and Control"}
+    ]
+    
+    # Select 1-3 techniques
+    selected_techniques = random.sample(mitre_techniques, k=random.randint(1, 3))
+    
+    return {
+        "alert_type": random.choice(alert_types),
+        "severity": random.choices(severities, weights=severity_weights, k=1)[0],
+        "status": random.choices(statuses, weights=status_weights, k=1)[0],
+        "detection_time": int(time.time() - random.randint(0, 86400)),  # Within the last 24 hours
+        "alert_id": ''.join(random.choices(string.ascii_uppercase + string.digits, k=12)),
+        "source": random.choice(["EDR", "SIEM", "Firewall", "IDS", "DLP", "Cloud Security", "Antivirus"]),
+        "mitre_techniques": selected_techniques,
+        "confidence": random.randint(50, 100)
     }
 
 
@@ -260,10 +595,10 @@ def fill_log_template(template: Dict[str, Any], entities: Dict[str, Any],
 
     # AZURE_AD specific
     if "tenantId" in log: log["tenantId"] = str(uuid.uuid4())
-    if "am_tenantId" in log: log["am_tenantId"] = log["tenantId"].upper()  # Often uppercase
+    if "am_tenantId" in log: log["am_tenantId"] = log["tenantId"].upper() if "tenantId" in log else str(uuid.uuid4()).upper()
     if "correlationId" in log: log["correlationId"] = str(uuid.uuid4())
     if "properties" in log and "id" in log["properties"]: log["properties"]["id"] = str(uuid.uuid4())
-    if "properties" in log and "correlationId" in log["properties"]: log["properties"]["correlationId"] = log["correlationId"]
+    if "properties" in log and "correlationId" in log["properties"]: log["properties"]["correlationId"] = log["correlationId"] if "correlationId" in log else str(uuid.uuid4())
     if "properties"in log and "initiatedBy" in log["properties"] and "user" in log["properties"]["initiatedBy"] and "id" in log["properties"]["initiatedBy"]["user"]:
         log["properties"]["initiatedBy"]["user"]["id"] = f"S-1-5-21-{random.randint(1000000000,2000000000)}-{random.randint(1000000000,2000000000)}-{random.randint(100000,200000)}"
     if "properties" in log and "targetResources" in log["properties"]:
@@ -284,14 +619,31 @@ def fill_log_template(template: Dict[str, Any], entities: Dict[str, Any],
              log["protoPayload"]["request"]["name"] = f"projects/-/serviceAccounts/{chosen_user}@{project_id}.iam.gserviceaccount.com"
         if "resourceName" in log["protoPayload"]:
             log["protoPayload"]["resourceName"] = f"projects/-/serviceAccounts/{random.randint(10**19, 10**20-1)}"
+        
+        # Add MITRE ATT&CK info to GCP logs (sometimes)
+        if random.random() < 0.3 and "requestMetadata" in log["protoPayload"]:
+            sec_info = generate_security_alert()
+            if "metadata" not in log["protoPayload"]:
+                log["protoPayload"]["metadata"] = {}
+            log["protoPayload"]["metadata"]["securityInfo"] = {
+                "threatDetails": {
+                    "severity": sec_info["severity"],
+                    "techniques": [t["id"] for t in sec_info["mitre_techniques"]],
+                    "confidence": sec_info["confidence"]
+                }
+            }
+            
     if "resource" in log and "labels" in log["resource"]:
         if "email_id" in log["resource"]["labels"]: log["resource"]["labels"]["email_id"] = f"{chosen_user}@{project_id}.iam.gserviceaccount.com"
         if "project_id" in log["resource"]["labels"]: log["resource"]["labels"]["project_id"] = project_id
         if "unique_id" in log["resource"]["labels"]: log["resource"]["labels"]["unique_id"] = str(random.randint(10**19, 10**20-1))
+        if "location" in log["resource"]["labels"] and not log["resource"]["labels"]["location"]:
+            cloud_info = generate_cloud_resource_info(project_id)
+            log["resource"]["labels"]["location"] = cloud_info["region"]
 
     # CS_EDR specific
     if "ParentProcessId" in log: log["ParentProcessId"] = str(random.randint(10**13, 10**14 -1))
-    if "SourceProcessId" in log: log["SourceProcessId"] = log["ParentProcessId"]  # Often the same in ProcessRollup
+    if "SourceProcessId" in log: log["SourceProcessId"] = log["ParentProcessId"] if "ParentProcessId" in log else str(random.randint(10**13, 10**14 -1))
     if "UserSid" in log: log["UserSid"] = f"S-1-5-21-{random.randint(1000000000,2000000000)}-{random.randint(1000000000,2000000000)}-{random.randint(1000,5000)}"
     if "id" in log and log_type == "CS_EDR": log["id"] = str(uuid.uuid4())  # CS_EDR id seems to be a UUID
     if "RawProcessId" in log: log["RawProcessId"] = str(random.randint(1000, 20000))
@@ -300,6 +652,77 @@ def fill_log_template(template: Dict[str, Any], entities: Dict[str, Any],
     if "ProcessStartTime" in log: log["ProcessStartTime"] = f"{time.time() - random.uniform(0, 3600):.3f}"  # Randomly in the last hour
     if "aid" in log: log["aid"] = ''.join(random.choices(string.ascii_lowercase + string.digits, k=32))
     if "cid" in log and customer_id: log["cid"] = customer_id  # Use the provided customer_id for CS_EDR logs
+    
+    # Mobile device related information
+    if "event_platform" in log and log["event_platform"] in ["iOS", "Mac", "Lin"]:
+        if log["event_platform"] == "iOS":
+            mobile_info = generate_mobile_device_info()
+            # Fill in iOS specific details
+            if "deviceDetail" in log:
+                if not isinstance(log["deviceDetail"], dict):
+                    log["deviceDetail"] = {}
+                log["deviceDetail"]["deviceId"] = mobile_info["device_id"]
+                log["deviceDetail"]["displayName"] = mobile_info["display_name"]
+                log["deviceDetail"]["isCompliant"] = mobile_info["is_compliant"] == "true"
+                log["deviceDetail"]["isManaged"] = mobile_info["is_managed"] == "true"
+                log["deviceDetail"]["operatingSystem"] = mobile_info["os_version"]
+                
+            # Set battery info for iOS logs with MobilePowerStats
+            if "event_simpleName" in log and log["event_simpleName"] == "MobilePowerStats":
+                log["BatteryLevel"] = str(random.randint(1, 100))
+                log["BatteryStatus"] = str(random.choice([0, 1, 2, 3]))  # 0=unknown, 1=unplugged, 2=charging, 3=full
+            
+            # Set ApplicationName for ProcessWitness events
+            if "event_simpleName" in log and log["event_simpleName"] == "ProcessWitness":
+                ios_apps = [".com.apple.purplebuddy", "com.apple.mobilesafari", "com.apple.mobilemail", 
+                           "com.apple.mobileslideshow", "com.apple.mobilenotes", "com.apple.Maps"]
+                log["ApplicationName"] = random.choice(ios_apps)
+                log["ApplicationVersion"] = f"{random.randint(1,15)}.{random.randint(0,9)}.{random.randint(0,9)}"
+                log["ApplicationUniqueIdentifier"] = ''.join(random.choices(string.hexdigits.lower(), k=40))
+        
+        # Set Linux specific details
+        elif log["event_platform"] == "Lin":
+            if "event_simpleName" in log and log["event_simpleName"] == "CriticalFileAccessed":
+                critical_files = ["/etc/shadow", "/etc/passwd", "/etc/sudoers", "/etc/ssh/sshd_config", 
+                                 "/root/.ssh/authorized_keys", "/etc/crontab", "/etc/hosts"]
+                log["TargetFileName"] = random.choice(critical_files)
+                log["GID"] = str(random.choice([0, 1000]))  # 0 = root, 1000 = common user
+                log["UID"] = str(random.choice([0, 1000]))
+                log["UnixMode"] = str(random.choice([32768, 33152, 33024]))  # Different permission modes
+
+    # Network connection related fields
+    if "event_simpleName" in log and ("NetworkConnect" in log["event_simpleName"] or "NetworkReceive" in log["event_simpleName"]):
+        network_info = generate_network_connection()
+        
+        if "LocalPort" in log: log["LocalPort"] = network_info["local_port"]
+        if "RemotePort" in log: log["RemotePort"] = network_info["remote_port"]
+        if "Protocol" in log: log["Protocol"] = network_info["protocol_number"]
+        if "ConnectionDirection" in log: log["ConnectionDirection"] = network_info["connection_direction"]
+        if "ConnectionFlags" in log: log["ConnectionFlags"] = network_info["connection_flags"]
+    
+    # DNS request related fields
+    if "event_simpleName" in log and ("DnsRequest" in log["event_simpleName"] or "SuspiciousDnsRequest" in log["event_simpleName"]):
+        dns_info = generate_dns_info()
+        
+        if "DomainName" in log: log["DomainName"] = dns_info["domain"]
+        if "DnsRequestCount" in log: log["DnsRequestCount"] = str(dns_info["request_count"])
+        if "RequestType" in log: log["RequestType"] = "1"  # 1 = A record
+        if "Protocol" in log and not log["Protocol"]: log["Protocol"] = dns_info["protocol"]
+        
+        # For suspicious DNS requests, add extra details
+        if "event_simpleName" in log and log["event_simpleName"] == "SuspiciousDnsRequest":
+            if "jsonPayload" not in log:
+                log["jsonPayload"] = {}
+            log["jsonPayload"]["suspiciousIndicators"] = {
+                "reason": random.choice([
+                    "Domain generation algorithm detected",
+                    "Newly registered domain",
+                    "Known malware command and control",
+                    "High entropy domain name",
+                    "Uncommon TLD usage"
+                ]),
+                "score": random.randint(70, 100)
+            }
 
     # Ensure all None placeholders that should have been filled are replaced, or remove them
     final_log = {}
